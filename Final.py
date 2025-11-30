@@ -37,6 +37,26 @@ st.markdown("""
         padding: 10px;
         border-bottom: 1px solid #eee;
     }
+    div.stButton > button:first-child {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    div.stButton > button:first-child:hover {
+        background-color: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+    }
+    
+    div.stButton > button:first-child:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -194,25 +214,25 @@ if st.session_state.app_state == 'upload':
             # Center the button
             btn_col1, btn_col2, btn_col3 = st.columns([1, 1, 1])
             with btn_col2:
-                st.markdown("""
-                            <style>
-                            div.stButton > button:first-child {
-                                background: linear-gradient(135deg, #28a745, #20c997);
-                                color: white;
-                                border: none;
-                                border-radius: 8px;
-                                padding: 12px 24px;
-                                font-weight: 600;
-                                transition: all 0.3s ease;
-                            }
+                # st.markdown("""
+                #             <style>
+                #             div.stButton > button:first-child {
+                #                 background: linear-gradient(135deg, #28a745, #20c997);
+                #                 color: white;
+                #                 border: none;
+                #                 border-radius: 8px;
+                #                 padding: 12px 24px;
+                #                 font-weight: 600;
+                #                 transition: all 0.3s ease;
+                #             }
 
-                            div.stButton > button:first-child:hover {
-                                background: linear-gradient(135deg, #218838, #1ea085);
-                                transform: translateY(-2px);
-                                box-shadow: 0 6px 15px rgba(32, 201, 151, 0.3);
-                            }
-                            </style>
-                            """, unsafe_allow_html=True)
+                #             div.stButton > button:first-child:hover {
+                #                 background: linear-gradient(135deg, #218838, #1ea085);
+                #                 transform: translateY(-2px);
+                #                 box-shadow: 0 6px 15px rgba(32, 201, 151, 0.3);
+                #             }
+                #             </style>
+                #             """, unsafe_allow_html=True)
                 if st.button("Analyze UI", type="primary", use_container_width=True):
                     change_state('analyzing')
 
@@ -287,55 +307,149 @@ elif st.session_state.app_state == 'analyzing':
 
 # 3. FEEDBACK HUB
 elif st.session_state.app_state == 'feedback_hub':
-    left_col, main_col, right_col = st.columns([1, 2.5, 1.2])
+    # Add custom CSS for larger cards and visible scrollbars
+    st.markdown("""
+    <style>
+    /* Larger expander headers */
+    .streamlit-expanderHeader {
+        font-size: 1.3rem !important;
+        padding: 20px !important;
+        min-height: 70px !important;
+    }
     
-    with left_col:
+    /* Custom scrollbar styling */
+    .custom-scrollbar {
+        scrollbar-width: thin !important;
+        scrollbar-color: #888 #f1f1f1 !important;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 12px !important;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f1f1 !important;
+        border-radius: 10px !important;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #888 !important;
+        border-radius: 10px !important;
+        border: 2px solid #f1f1f1 !important;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #555 !important;
+    }
+    
+    /* Larger cards with more padding */
+    .streamlit-expanderContent {
+        padding: 20px !important;
+    }
+    
+    /* Increase spacing between issues */
+    .issue-item {
+        margin-bottom: 25px !important;
+        padding: 15px !important;
+        border-radius: 8px !important;
+        background-color: #f8f9fa !important;
+    }
+    
+    /* Reviewed feedback card */
+    .reviewed-feedback {
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: #d4edda;
+        border: 2px solid #28a745;
+        border-radius: 10px;
+        padding: 15px;
+        z-index: 1000;
+        animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Show reviewed feedback card if there are reviewed categories
+    reviewed_cats = list(st.session_state.reviewed_categories)
+    if reviewed_cats:
+        # Get the most recently reviewed category (last one added)
+        latest_reviewed = reviewed_cats[-1] if reviewed_cats else ""
+        
         st.markdown(f"""
-        <div class="custom-card">
-            <h4>📊 Overview</h4>
-            <p class="secondary-text">Review feedback cards. Accept findings to include them in the PDF report.</p>
+        <div class="reviewed-feedback">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">✅</span>
+                <div>
+                    <strong style="color: #155724;">{latest_reviewed} Reviewed!</strong>
+                    <div style="font-size: 0.9em; color: #155724;">
+                        {len(reviewed_cats)} of {len(st.session_state.analysis_data)} categories completed
+                    </div>
+                </div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
-
-    with main_col:
-        st.markdown("### 📌 Action Items")
-        all_cats = list(st.session_state.analysis_data.keys())
-        pending_cats = [c for c in all_cats if c not in st.session_state.reviewed_categories]
+    
+    # Single column layout without the reviewed card
+    st.markdown("### 📌 To Do")
+    all_cats = list(st.session_state.analysis_data.keys())
+    pending_cats = [c for c in all_cats if c not in st.session_state.reviewed_categories]
+    
+    if pending_cats:
+        for cat in pending_cats:
+            with st.expander(f"🎨 {cat}", expanded=True):
+                # Container with visible scrollbar
+                with st.container(height=400):
+                    issues = st.session_state.analysis_data[cat]['issues']
+                    for i, issue in enumerate(issues):
+                        st.markdown(f"""
+                        <div class="issue-item">
+                            <strong>Issue {i+1}:</strong> {issue['text']}
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        ic1, ic2 = st.columns([1, 2])
+                        with ic1:
+                            issue['accepted'] = st.toggle("✅ Accept", value=issue['accepted'], key=f"tg_{cat}_{i}")
+                        with ic2:
+                            issue['comment'] = st.text_input("Comment", 
+                                                           value=issue['comment'], 
+                                                           placeholder="Add context or notes...", 
+                                                           key=f"txt_{cat}_{i}", 
+                                                           label_visibility="collapsed")
+                        
+                        if i < len(issues) - 1:
+                            st.markdown("<div style='margin: 20px 0;'></div>", unsafe_allow_html=True)
+            
+            # Large "Mark as Reviewed" button
+            if st.button(f"✅ Mark {cat} as Reviewed", 
+                       key=f"done_{cat}", 
+                       use_container_width=True):
+                mark_reviewed(cat)
+    else:
+        st.markdown(f"""
+        <div class="custom-card" style="text-align: center; border-color: #28a745; padding: 30px;">
+            <h3 style="color: #28a745 !important;">🎉 All Clear!</h3>
+            <p>You have reviewed all feedback categories.</p>
+        </div>
+        """, unsafe_allow_html=True)
         
-        if pending_cats:
-            for cat in pending_cats:
-                with st.expander(f"{cat}", expanded=True):
-                    with st.container(height=250):
-                        issues = st.session_state.analysis_data[cat]['issues']
-                        for i, issue in enumerate(issues):
-                            st.markdown(f"**Issue {i+1}:** {issue['text']}")
-                            ic1, ic2 = st.columns([0.8, 2])
-                            with ic1:
-                                issue['accepted'] = st.toggle("✅ Accept", value=issue['accepted'], key=f"tg_{cat}_{i}")
-                            with ic2:
-                                issue['comment'] = st.text_input("Comment", value=issue['comment'], placeholder="Add context...", key=f"txt_{cat}_{i}", label_visibility="collapsed")
-                            st.divider()
-                    if st.button(f"Mark {cat} as Reviewed", key=f"done_{cat}", use_container_width=True):
-                        mark_reviewed(cat)
-        else:
-            st.markdown(f"""
-            <div class="custom-card" style="text-align: center; border-color: #2e7d32;">
-                <h3 style="color: #2e7d32 !important;">🎉 All Clear!</h3>
-                <p>You have reviewed all feedback categories.</p>
-            </div>
-            """, unsafe_allow_html=True)
-            if st.button("Generate Final Report", type="primary", use_container_width=True):
-                change_state('report')
+        # Large "Generate Final Report" button
+        if st.button("Generate Final Report", use_container_width=True):
+            change_state('report')
 
-    with right_col:
-        st.markdown(f"""<div class="custom-card"><h4>✅ Reviewed</h4>""", unsafe_allow_html=True)
-        reviewed_cats = list(st.session_state.reviewed_categories)
-        if reviewed_cats:
-            for cat in reviewed_cats:
-                st.markdown(f"<div class='reviewed-item'>✔ {cat}</div>", unsafe_allow_html=True)
-        else:
-            st.markdown("<p class='secondary-text' style='padding:10px;'>No categories reviewed yet.</p>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+
 
 # 4. FINAL REPORT
 elif st.session_state.app_state == 'report':
