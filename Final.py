@@ -217,9 +217,62 @@ if st.session_state.app_state == 'upload':
                     change_state('analyzing')
 
 # 2. ANALYZING SCREEN
+# elif st.session_state.app_state == 'analyzing':
+#     st.markdown("<div class='app-header'><h1>Analyzing...</h1></div>", unsafe_allow_html=True)
+#     st.image("https://cdn-icons-png.flaticon.com/512/2040/2040946.png", width=120)
+    
+#     my_bar = st.progress(0)
+#     status = st.empty()
+#     steps = ["Scanning Layout...", "Checking Contrast...", "Verifying Consistency...", "Generating Feedback..."]
+    
+#     for i, step in enumerate(steps):
+#         status.text(step)
+#         my_bar.progress((i + 1) * 25)
+#         time.sleep(0.5)
+    
+#     change_state('feedback_hub')
+
+# 2. ANALYZING SCREEN
 elif st.session_state.app_state == 'analyzing':
-    st.markdown("<div class='app-header'><h1>Analyzing...</h1></div>", unsafe_allow_html=True)
-    st.image("https://cdn-icons-png.flaticon.com/512/2040/2040946.png", width=120)
+    st.markdown("""
+    <style>
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+    }
+    @keyframes dotPulse {
+        0%, 100% { opacity: 0.3; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.2); }
+    }
+    .dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #28a745;
+        margin: 0 5px;
+        animation: dotPulse 1.5s infinite ease-in-out;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<div class='app-header'><h1>Analyzing Your Design</h1></div>", unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.markdown("""
+        <div style="text-align: center;">
+            <img src="https://cdn-icons-png.flaticon.com/512/2040/2040946.png" width="150" 
+                 style="animation: bounce 2s infinite ease-in-out;">
+            <div style="margin-top: 20px;">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     
     my_bar = st.progress(0)
     status = st.empty()
@@ -228,7 +281,7 @@ elif st.session_state.app_state == 'analyzing':
     for i, step in enumerate(steps):
         status.text(step)
         my_bar.progress((i + 1) * 25)
-        time.sleep(0.5)
+        time.sleep(1.2)
     
     change_state('feedback_hub')
 
