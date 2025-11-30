@@ -452,52 +452,188 @@ elif st.session_state.app_state == 'feedback_hub':
 
 
 # 4. FINAL REPORT
+# elif st.session_state.app_state == 'report':
+#     c1, c2, c3 = st.columns([1, 3, 1])
+#     with c2:
+#         st.balloons()
+#         st.markdown(f"""
+#         <div class="custom-card">
+#             <h2 style="text-align: center; margin-bottom: 20px;">📊 Collaborative Audit Report</h2>
+#             <hr style="border-top: 1px solid {border_color};">
+#         """, unsafe_allow_html=True)
+        
+#         # Display On-Screen Report
+#         for cat, data in st.session_state.analysis_data.items():
+#             accepted_count = sum(1 for i in data['issues'] if i['accepted'])
+#             if accepted_count > 0:
+#                 st.markdown(f"#### {cat}")
+#                 for issue in data['issues']:
+#                     if issue['accepted']:
+#                         st.markdown(f"""
+#                         <div style="background-color: {bg_color}; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+#                             <div>✅ <b>Accepted:</b> {issue['text']}</div>
+#                             <div style="font-size: 0.9em; color: {secondary_text}; margin-left: 25px;">
+#                                 <i>Note: {issue['comment'] if issue['comment'] else 'No comments'}</i>
+#                             </div>
+#                         </div>
+#                         """, unsafe_allow_html=True)
+#                 st.markdown("<br>", unsafe_allow_html=True)
+        
+#         st.markdown("</div>", unsafe_allow_html=True)
+
+#         # PDF Download Section
+#         st.markdown("### 📥 Download")
+        
+#         # Generate PDF Bytes
+#         try:
+#             pdf_data = generate_pdf_bytes(st.session_state.analysis_data)
+            
+#             col_d1, col_d2 = st.columns(2)
+#             with col_d1:
+#                 st.download_button(
+#                     label="📄 Download PDF Report",
+#                     data=pdf_data,
+#                     file_name="UI_Audit_Report.pdf",
+#                     mime="application/pdf",
+#                     type="primary",
+#                     use_container_width=True
+#                 )
+#             with col_d2:
+#                  if st.button("Start New Audit", use_container_width=True):
+#                     st.session_state.app_state = 'upload'
+#                     st.session_state.reviewed_categories = set()
+#                     st.rerun()
+
+#         except Exception as e:
+#             st.error(f"Error generating PDF: {e}")
+
+# 4. FINAL REPORT
+# 4. FINAL REPORT
 elif st.session_state.app_state == 'report':
     c1, c2, c3 = st.columns([1, 3, 1])
     with c2:
         st.balloons()
-        st.markdown(f"""
-        <div class="custom-card">
-            <h2 style="text-align: center; margin-bottom: 20px;">📊 Collaborative Audit Report</h2>
-            <hr style="border-top: 1px solid {border_color};">
-        """, unsafe_allow_html=True)
         
-        # Display On-Screen Report
+        # Professional header without card
+        st.markdown("""
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="color: #2c3e50; margin-bottom: 10px;">UI Audit Report</h1>
+            <p style="color: #7f8c8d; font-size: 1.1rem; border-bottom: 2px solid #3498db; padding-bottom: 20px;">
+                Comprehensive Analysis • {date}
+            </p>
+        </div>
+        """.format(date=datetime.now().strftime("%B %d, %Y")), unsafe_allow_html=True)
+        
+        # Display On-Screen Report - Professional layout
         for cat, data in st.session_state.analysis_data.items():
             accepted_count = sum(1 for i in data['issues'] if i['accepted'])
             if accepted_count > 0:
-                st.markdown(f"#### {cat}")
+                # Category header
+                st.markdown(f"""
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                            color: white; padding: 15px 20px; border-radius: 8px; margin: 30px 0 15px 0;">
+                    <h3 style="margin: 0; color: white;">{cat}</h3>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Accepted issues as clean bullet points
                 for issue in data['issues']:
                     if issue['accepted']:
-                        st.markdown(f"""
-                        <div style="background-color: {bg_color}; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-                            <div>✅ <b>Accepted:</b> {issue['text']}</div>
-                            <div style="font-size: 0.9em; color: {secondary_text}; margin-left: 25px;">
-                                <i>Note: {issue['comment'] if issue['comment'] else 'No comments'}</i>
+                        if issue['comment']:
+                            st.markdown(f"""
+                            <div style="margin: 8px 0; padding-left: 20px;">
+                                <div style="display: flex; align-items: flex-start;">
+                                    <span style="color: #27ae60; margin-right: 10px;">•</span>
+                                    <div>
+                                        <span style="font-weight: 500;">{issue['text']}</span>
+                                        <div style="color: #7f8c8d; font-size: 0.9em; margin-top: 2px; font-style: italic;">
+                                            Note: {issue['comment']}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        """, unsafe_allow_html=True)
-                st.markdown("<br>", unsafe_allow_html=True)
+                            """, unsafe_allow_html=True)
+                        else:
+                            st.markdown(f"""
+                            <div style="margin: 8px 0; padding-left: 20px;">
+                                <div style="display: flex; align-items: center;">
+                                    <span style="color: #27ae60; margin-right: 10px;">•</span>
+                                    <span style="font-weight: 500;">{issue['text']}</span>
+                                </div>
+                            </div>
+                            """, unsafe_allow_html=True)
+
+        # Summary section with rejected issues
+        total_issues = sum(len(data['issues']) for data in st.session_state.analysis_data.values())
+        accepted_issues = sum(1 for data in st.session_state.analysis_data.values() for issue in data['issues'] if issue['accepted'])
+        rejected_issues = total_issues - accepted_issues
         
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #3498db; margin-top: 30px;">
+            <h4 style="color: #2c3e50; margin-top: 0;">Summary</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                <div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Total Issues Identified</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #2c3e50;">{total_issues}</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Issues Addressed</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #27ae60;">{accepted_issues}</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Issues Rejected</div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #e74c3c;">{rejected_issues}</div>
+                </div>
+            </div>
+        </div>
+        """.format(total_issues=total_issues, accepted_issues=accepted_issues, rejected_issues=rejected_issues), unsafe_allow_html=True)
 
         # PDF Download Section
-        st.markdown("### 📥 Download")
+                # PDF Download Section
+        st.markdown("""
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ecf0f1;">
+            <h4 style="color: #2c3e50; margin-bottom: 20px;">Export Report</h4>
+        </div>
+        """, unsafe_allow_html=True)
         
         # Generate PDF Bytes
         try:
             pdf_data = generate_pdf_bytes(st.session_state.analysis_data)
             
+            # Add custom CSS for red download button
+            st.markdown("""
+            <style>
+            /* Red download button */
+            div.stDownloadButton > button {
+                background-color: #e74c3c !important;
+                color: white !important;
+                border: none !important;
+                border-radius: 8px !important;
+                padding: 12px 24px !important;
+                font-weight: 600 !important;
+                transition: all 0.3s ease !important;
+            }
+            
+            div.stDownloadButton > button:hover {
+                background-color: #c0392b !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3) !important;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            
+            # Two columns for aligned buttons
             col_d1, col_d2 = st.columns(2)
             with col_d1:
-                st.download_button(
-                    label="📄 Download PDF Report",
+                if st.download_button(
+                    label="⬇️PDF Report",
                     data=pdf_data,
-                    file_name="UI_Audit_Report.pdf",
+                    file_name="ui_audit_report.pdf",
                     mime="application/pdf",
-                    type="primary",
                     use_container_width=True
-                )
+                ):
+                    st.toast("Your report has been downloaded!", icon="✅")
+            
             with col_d2:
                  if st.button("Start New Audit", use_container_width=True):
                     st.session_state.app_state = 'upload'
