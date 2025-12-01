@@ -354,6 +354,150 @@ elif st.session_state.app_state == 'analyzing':
     change_state('feedback_hub')
 
 # 3. FEEDBACK HUB
+# elif st.session_state.app_state == 'feedback_hub':
+#     # Add custom CSS for larger cards and visible scrollbars
+#     st.markdown("""
+#     <style>
+#     /* Larger expander headers */
+#     .streamlit-expanderHeader {
+#         font-size: 1.3rem !important;
+#         padding: 20px !important;
+#         min-height: 70px !important;
+#     }
+    
+#     /* Custom scrollbar styling */
+#     .custom-scrollbar {
+#         scrollbar-width: thin !important;
+#         scrollbar-color: #888 #f1f1f1 !important;
+#     }
+    
+#     .custom-scrollbar::-webkit-scrollbar {
+#         width: 12px !important;
+#     }
+    
+#     .custom-scrollbar::-webkit-scrollbar-track {
+#         background: #f1f1f1 !important;
+#         border-radius: 10px !important;
+#     }
+    
+#     .custom-scrollbar::-webkit-scrollbar-thumb {
+#         background: #888 !important;
+#         border-radius: 10px !important;
+#         border: 2px solid #f1f1f1 !important;
+#     }
+    
+#     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+#         background: #555 !important;
+#     }
+    
+#     /* Larger cards with more padding */
+#     .streamlit-expanderContent {
+#         padding: 20px !important;
+#     }
+    
+#     /* Increase spacing between issues */
+#     .issue-item {
+#         margin-bottom: 25px !important;
+#         padding: 15px !important;
+#         border-radius: 8px !important;
+#         background-color: #f8f9fa !important;
+#     }
+    
+#     /* Reviewed feedback card */
+#     .reviewed-feedback {
+#         position: fixed;
+#         top: 100px;
+#         right: 20px;
+#         background: #d4edda;
+#         border: 2px solid #28a745;
+#         border-radius: 10px;
+#         padding: 15px;
+#         z-index: 1000;
+#         animation: slideIn 0.5s ease-out;
+#     }
+    
+#     @keyframes slideIn {
+#         from {
+#             transform: translateX(100%);
+#             opacity: 0;
+#         }
+#         to {
+#             transform: translateX(0);
+#             opacity: 1;
+#         }
+#     }
+#     </style>
+#     """, unsafe_allow_html=True)
+    
+#     # Show reviewed feedback card if there are reviewed categories
+#     reviewed_cats = list(st.session_state.reviewed_categories)
+#     if reviewed_cats:
+#         # Get the most recently reviewed category (last one added)
+#         latest_reviewed = reviewed_cats[-1] if reviewed_cats else ""
+        
+#         st.markdown(f"""
+#         <div class="reviewed-feedback">
+#             <div style="display: flex; align-items: center; gap: 10px;">
+#                 <span style="font-size: 24px;">✅</span>
+#                 <div>
+#                     <strong style="color: #155724;">{latest_reviewed} Reviewed!</strong>
+#                     <div style="font-size: 0.9em; color: #155724;">
+#                         {len(reviewed_cats)} of {len(st.session_state.analysis_data)} categories completed
+#                     </div>
+#                 </div>
+#             </div>
+#         </div>
+#         """, unsafe_allow_html=True)
+    
+#     # Single column layout without the reviewed card
+#     st.markdown("### 📌 To Do")
+#     all_cats = list(st.session_state.analysis_data.keys())
+#     pending_cats = [c for c in all_cats if c not in st.session_state.reviewed_categories]
+    
+#     if pending_cats:
+#         for cat in pending_cats:
+#             with st.expander(f"🎨 {cat}", expanded=True):
+#                 # Container with visible scrollbar
+#                 with st.container(height=400):
+#                     issues = st.session_state.analysis_data[cat]['issues']
+#                     for i, issue in enumerate(issues):
+#                         st.markdown(f"""
+#                         <div class="issue-item">
+#                             <strong>Issue {i+1}:</strong> {issue['text']}
+#                         </div>
+#                         """, unsafe_allow_html=True)
+                        
+#                         ic1, ic2 = st.columns([1, 2])
+#                         with ic1:
+#                             issue['accepted'] = st.toggle("✅ Accept", value=issue['accepted'], key=f"tg_{cat}_{i}")
+#                         with ic2:
+#                             issue['comment'] = st.text_input("Comment", 
+#                                                            value=issue['comment'], 
+#                                                            placeholder="Add context or notes...", 
+#                                                            key=f"txt_{cat}_{i}", 
+#                                                            label_visibility="collapsed")
+                        
+#                         if i < len(issues) - 1:
+#                             st.markdown("<div style='margin: 20px 0;'></div>", unsafe_allow_html=True)
+            
+#             # Large "Mark as Reviewed" button
+#             if st.button(f"Mark {cat} as Reviewed", 
+#                        key=f"done_{cat}", 
+#                        use_container_width=True):
+#                 mark_reviewed(cat)
+#     else:
+#         st.markdown(f"""
+#         <div class="custom-card" style="text-align: center; border-color: #28a745; padding: 30px;">
+#             <h3 style="color: #28a745 !important;">🎉 All Clear!</h3>
+#             <p>You have reviewed all feedback categories.</p>
+#         </div>
+#         """, unsafe_allow_html=True)
+        
+#         # Large "Generate Final Report" button
+#         if st.button("Generate Final Report", use_container_width=True):
+#             change_state('report')
+
+# 3. FEEDBACK HUB
 elif st.session_state.app_state == 'feedback_hub':
     # Add custom CSS for larger cards and visible scrollbars
     st.markdown("""
@@ -403,7 +547,7 @@ elif st.session_state.app_state == 'feedback_hub':
         background-color: #f8f9fa !important;
     }
     
-    /* Reviewed feedback card */
+    /* Reviewed feedback card - LOWERED POSITION */
     .reviewed-feedback {
         position: fixed;
         top: 100px;
@@ -414,6 +558,7 @@ elif st.session_state.app_state == 'feedback_hub':
         padding: 15px;
         z-index: 1000;
         animation: slideIn 0.5s ease-out;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     
     @keyframes slideIn {
@@ -430,27 +575,30 @@ elif st.session_state.app_state == 'feedback_hub':
     """, unsafe_allow_html=True)
     
     # Show reviewed feedback card if there are reviewed categories
+       # Show reviewed feedback card if there are reviewed categories
     reviewed_cats = list(st.session_state.reviewed_categories)
     if reviewed_cats:
-        # Get the most recently reviewed category (last one added)
-        latest_reviewed = reviewed_cats[-1] if reviewed_cats else ""
+        # Get current category being reviewed (first pending category)
+        all_cats = list(st.session_state.analysis_data.keys())
+        pending_cats = [c for c in all_cats if c not in st.session_state.reviewed_categories]
+        current_category = pending_cats[0] if pending_cats else "All"
         
         st.markdown(f"""
         <div class="reviewed-feedback">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 24px;">✅</span>
-                <div>
-                    <strong style="color: #155724;">{latest_reviewed} Reviewed!</strong>
-                    <div style="font-size: 0.9em; color: #155724;">
-                        {len(reviewed_cats)} of {len(st.session_state.analysis_data)} categories completed
-                    </div>
+            <div>
+                <strong style="color: #155724; font-size: 1.1em;">Progress Update</strong>
+                <div style="font-size: 0.9em; color: #155724; margin-top: 8px;">
+                    Completed: {len(reviewed_cats)} of {len(all_cats)} categories
+                </div>
+                <div style="font-size: 0.8em; color: #155724; margin-top: 5px;">
+                    Next: {current_category if current_category != "All" else "Generate Report"}
                 </div>
             </div>
         </div>
         """, unsafe_allow_html=True)
-    
+
     # Single column layout without the reviewed card
-    st.markdown("### 📌 To Do")
+    st.markdown("### 📌 Action Items")
     all_cats = list(st.session_state.analysis_data.keys())
     pending_cats = [c for c in all_cats if c not in st.session_state.reviewed_categories]
     
@@ -496,7 +644,6 @@ elif st.session_state.app_state == 'feedback_hub':
         # Large "Generate Final Report" button
         if st.button("Generate Final Report", use_container_width=True):
             change_state('report')
-
 
 # 4. FINAL REPORT
 elif st.session_state.app_state == 'report':
