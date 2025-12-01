@@ -112,7 +112,7 @@ class PDFReport(FPDF):
         
         self.set_font('Arial', '', 10)
         for i, issue in enumerate(issues, 1):
-            # status = "ACCEPTED" if issue['accepted'] else "REJECTED"
+            status = "ACCEPTED" if issue['accepted'] else "REJECTED"
             self.set_font('Arial', 'B', 10)
             self.cell(0, 8, f'Issue {i}: [{status}]', 0, 1)
             self.set_font('Arial', '', 10)
@@ -191,7 +191,6 @@ secondary_text = "#6c757d"
 #         if st.button("Analyze UI", type="primary"):
 #             change_state('analyzing')
 
-# 1. UPLOAD SCREEN
 # 1. UPLOAD SCREEN
 if st.session_state.app_state == 'upload':
     # Center everything using a single centered column
@@ -350,7 +349,7 @@ elif st.session_state.app_state == 'analyzing':
             # Center the status text
             status.markdown(f"<div style='text-align: center; font-size: 1.2rem;'>{step}</div>", unsafe_allow_html=True)
             my_bar.progress((i + 1) * 25)
-            time.sleep(1.5)
+            time.sleep(1.2)
     
     change_state('feedback_hub')
 
@@ -482,7 +481,7 @@ elif st.session_state.app_state == 'feedback_hub':
                             st.markdown("<div style='margin: 20px 0;'></div>", unsafe_allow_html=True)
             
             # Large "Mark as Reviewed" button
-            if st.button(f"✅ Mark {cat} as Reviewed", 
+            if st.button(f"Mark {cat} as Reviewed", 
                        key=f"done_{cat}", 
                        use_container_width=True):
                 mark_reviewed(cat)
@@ -499,64 +498,6 @@ elif st.session_state.app_state == 'feedback_hub':
             change_state('report')
 
 
-
-# 4. FINAL REPORT
-# elif st.session_state.app_state == 'report':
-#     c1, c2, c3 = st.columns([1, 3, 1])
-#     with c2:
-#         st.balloons()
-#         st.markdown(f"""
-#         <div class="custom-card">
-#             <h2 style="text-align: center; margin-bottom: 20px;">📊 Collaborative Audit Report</h2>
-#             <hr style="border-top: 1px solid {border_color};">
-#         """, unsafe_allow_html=True)
-        
-#         # Display On-Screen Report
-#         for cat, data in st.session_state.analysis_data.items():
-#             accepted_count = sum(1 for i in data['issues'] if i['accepted'])
-#             if accepted_count > 0:
-#                 st.markdown(f"#### {cat}")
-#                 for issue in data['issues']:
-#                     if issue['accepted']:
-#                         st.markdown(f"""
-#                         <div style="background-color: {bg_color}; padding: 10px; border-radius: 5px; margin-bottom: 10px;">
-#                             <div>✅ <b>Accepted:</b> {issue['text']}</div>
-#                             <div style="font-size: 0.9em; color: {secondary_text}; margin-left: 25px;">
-#                                 <i>Note: {issue['comment'] if issue['comment'] else 'No comments'}</i>
-#                             </div>
-#                         </div>
-#                         """, unsafe_allow_html=True)
-#                 st.markdown("<br>", unsafe_allow_html=True)
-        
-#         st.markdown("</div>", unsafe_allow_html=True)
-
-#         # PDF Download Section
-#         st.markdown("### 📥 Download")
-        
-#         # Generate PDF Bytes
-#         try:
-#             pdf_data = generate_pdf_bytes(st.session_state.analysis_data)
-            
-#             col_d1, col_d2 = st.columns(2)
-#             with col_d1:
-#                 st.download_button(
-#                     label="📄 Download PDF Report",
-#                     data=pdf_data,
-#                     file_name="UI_Audit_Report.pdf",
-#                     mime="application/pdf",
-#                     type="primary",
-#                     use_container_width=True
-#                 )
-#             with col_d2:
-#                  if st.button("Start New Audit", use_container_width=True):
-#                     st.session_state.app_state = 'upload'
-#                     st.session_state.reviewed_categories = set()
-#                     st.rerun()
-
-#         except Exception as e:
-#             st.error(f"Error generating PDF: {e}")
-
-# 4. FINAL REPORT
 # 4. FINAL REPORT
 elif st.session_state.app_state == 'report':
     c1, c2, c3 = st.columns([1, 3, 1])
