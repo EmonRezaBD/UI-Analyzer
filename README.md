@@ -1,2 +1,2 @@
-# UI-Analyzer
-An AI based mobile UI analyzer keeping human in loop 
+# Intelligent-UI-Analyzer
+A LLM based UI analyzer keeping human in loop. 
